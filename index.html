@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Schultoiletten Protokoll</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1f3b57">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Toiletten Protokoll">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #f2f4f7;
+        color: #222;
+    }
+    header {
+        background: #1f3b57;
+        color: white;
+        padding: 18px;
+        text-align: center;
+    }
+    main {
+        max-width: 1200px;
+        margin: auto;
+        padding: 20px;
+    }
+    .card {
+        background: white;
+        padding: 18px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        margin-bottom: 20px;
+    }
+    label {
+        font-weight: bold;
+        display: block;
+        margin-top: 12px;
+    }
+    input, textarea, select {
+        width: 100%;
+        padding: 9px;
+        margin-top: 5px;
+        box-sizing: border-box;
+        border: 1px solid #aaa;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+    textarea {
+        min-height: 80px;
+    }
+    button {
+        background: #1f3b57;
+        color: white;
+        border: none;
+        padding: 10px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 6px 4px 6px 0;
+        font-size: 14px;
+    }
+    button:hover {
+        background: #315b83;
+    }
+    .danger {
+        background: #a82626;
+    }
+    .danger:hover {
+        background: #c03939;
+    }
+    .success {
+        background: #237a3b;
+    }
+    .success:hover {
+        background: #2f9c4d;
+    }
+    .warning {
+        background: #b36b00;
+    }
+    .warning:hover {
+        background: #d98200;
+    }
+    .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        margin-top: 12px;
+        font-size: 13px;
+    }
+    th, td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        vertical-align: top;
+    }
+    th {
+        background: #e8edf3;
+    }
+    .photo-preview img, .entry-photo {
+        max-width: 90px;
+        max-height: 90px;
+        margin: 4px;
+        border: 1px solid #999;
+        border-radius: 4px;
+        object-fit: cover;
+    }
+    .small {
+        font-size: 12px;
+        color: #555;
+    }
+    .hidden {
+        display: none;
+    }
+
+    .photo-modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.88);
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+    .photo-modal img {
+        max-width: 92%;
+        max-height: 82%;
+        border: 3px solid white;
+        border-radius: 6px;
+        background: white;
+    }
+    .modal-close {
+        position: absolute;
+        top: 15px;
+        right: 25px;
+        color: white;
+        font-size: 38px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .modal-controls {
+        margin-top: 15px;
+        text-align: center;
+    }
+    .modal-controls button {
+        background: white;
+        color: #1f3b57;
+        font-weight: bold;
+        margin: 0 10px;
+    }
+    .modal-counter {
+        color: white;
+        margin-top: 10px;
+        font-size: 14px;
+    }
+
+
+    .drop-zone {
+        border: 2px dashed #7f8fa6;
+        border-radius: 8px;
+        padding: 16px;
+        text-align: center;
+        background: #f8fafc;
+        margin-top: 8px;
+        cursor: pointer;
+    }
+    .drop-zone.dragover {
+        background: #e8f0fb;
+        border-color: #1f3b57;
+    }
+    .photo-wrapper {
+        display: inline-block;
+        position: relative;
+        margin: 5px;
+    }
+    .photo-wrapper img {
+        max-width: 90px;
+        max-height: 90px;
+        border: 1px solid #999;
+        border-radius: 4px;
+        object-fit: cover;
+    }
+    .remove-photo {
+        position: absolute;
+        top: -7px;
+        right: -7px;
+        background: #a82626;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 22px;
+        height: 22px;
+        padding: 0;
+        font-size: 14px;
+        line-height: 20px;
+        cursor: pointer;
+    }
+    .photo-count {
+        font-size: 13px;
+        color: #333;
+        margin-top: 6px;
+        font-weight: bold;
+    }
+
+    @media print {
+        body {
+            background: white;
+        }
+        header, .no-print, .card.no-print {
+            display: none !important;
+        }
+        main {
+            max-width: none;
+            padding: 0;
+        }
+        table {
+            font-size: 11px;
+        }
+        button {
+            display: none;
+        }
+        .entry-photo {
+            max-width: 120px;
+            max-height: 120px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Schultoiletten Protokoll</h1>
+    <p>Dokumentation von Vandalismus, Schäden, Verstopfungen und Überschwemmungen</p>
+</header>
+
+<main>
+
+    <section class="card no-print" id="installBox">
+        <h2>Handy-App nutzen</h2>
+        <p>Diese Seite kann auf dem Handy wie eine App gespeichert werden.</p>
+        <p><b>Android / Chrome:</b> Menü ⋮ öffnen → „Zum Startbildschirm hinzufügen“ oder „App installieren“.</p>
+        <p><b>iPhone / Safari:</b> Teilen-Symbol öffnen → „Zum Home-Bildschirm“.</p>
+        <p class="small">Hinweis: Die Daten werden lokal auf dem jeweiligen Gerät gespeichert. PC und Handy haben also getrennte Einträge.</p>
+    </section>
+
+    <section class="card no-print">
+        <h2>Neuen Vorfall eintragen</h2>
+
+        <label>Datum</label>
+        <input type="date" id="datum">
+
+        <label>Uhrzeit</label>
+        <input type="time" id="uhrzeit">
+
+        <label>Bereich / Toilette</label>
+        <input type="text" id="bereich" placeholder="z. B. Jungentoilette, Urinale, Waschbecken, Kabine 2">
+
+        <label>Art des Vorfalls</label>
+        <select id="art">
+            <option>Verstopfung</option>
+            <option>Überschwemmung</option>
+            <option>Beschädigung</option>
+            <option>Vandalismus</option>
+            <option>Verschmutzung</option>
+            <option>Sonstiges</option>
+        </select>
+
+        <label>Beschreibung</label>
+        <textarea id="beschreibung" placeholder="Was wurde festgestellt?"></textarea>
+
+        <label>Durchgeführte Maßnahme</label>
+        <textarea id="massnahme" placeholder="Was wurde gemacht? Z. B. abgesperrt, gereinigt, repariert, gemeldet..."></textarea>
+
+        <label>Meldung an</label>
+        <input type="text" id="meldung" placeholder="z. B. Schulleitung, Sekretariat, Reinigung, Fachfirma">
+
+        <label>Klasse / Aufsicht / Hinweis</label>
+        <input type="text" id="aufsicht" placeholder="Optional: Klasse, Lehrer, Zeitraum, sonstiger Hinweis">
+
+        <label>Fotos beifügen</label>
+        <div id="dropZone" class="drop-zone" onclick="document.getElementById('fotos').click()">
+            Fotos hier hineinziehen oder klicken zum Auswählen
+        </div>
+        <input class="hidden" type="file" id="fotos" accept="image/*" capture="environment" multiple>
+        <div id="fotoAnzahl" class="photo-count">Keine Fotos ausgewählt</div>
+        <div id="fotoVorschau" class="photo-preview"></div>
+        <p class="small">Du kannst mehrere Fotos auswählen, per Drag & Drop einfügen und einzelne Fotos vor dem Speichern wieder entfernen.</p>
+
+        <button id="speicherButton" class="success" onclick="speichern()">Eintrag speichern</button>
+        <button id="abbrechenButton" class="warning hidden" onclick="bearbeitenAbbrechen()">Bearbeiten abbrechen</button>
+        <button onclick="formularLeeren()">Formular leeren</button>
+    </section>
+
+    <section class="card no-print">
+        <h2>Suche / Ausgabe</h2>
+        <div class="toolbar">
+            <input style="max-width:300px" type="text" id="suche" placeholder="Suche nach Datum, Bereich, Schaden..." oninput="anzeigen()">
+            <button onclick="window.print()">Drucken / als PDF speichern</button>
+            <button onclick="exportJSON()">Sicherung exportieren</button>
+            <label style="display:inline; font-weight:normal;">
+                <input class="hidden" type="file" id="importDatei" accept=".json" onchange="importJSON(event)">
+                <button onclick="document.getElementById('importDatei').click()">Sicherung importieren</button>
+            </label>
+            <button class="danger" onclick="alleLoeschen()">Alle Einträge löschen</button>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Protokollübersicht</h2>
+        <p id="anzahl"></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Datum</th>
+                    <th>Uhrzeit</th>
+                    <th>Bereich</th>
+                    <th>Art</th>
+                    <th>Beschreibung</th>
+                    <th>Maßnahme</th>
+                    <th>Meldung / Hinweis</th>
+                    <th>Fotos</th>
+                    <th class="no-print">Aktion</th>
+                </tr>
+            </thead>
+            <tbody id="liste"></tbody>
+        </table>
+    </section>
+
+    <div id="photoModal" class="photo-modal no-print" onclick="modalHintergrundSchliessen(event)">
+        <span class="modal-close" onclick="fotoSchliessen()">&times;</span>
+        <img id="modalImage" src="" alt="Großansicht">
+        <div class="modal-controls">
+            <button onclick="event.stopPropagation(); fotoZurueck();">← Zurück</button>
+            <button onclick="event.stopPropagation(); fotoWeiter();">Weiter →</button>
+        </div>
+        <div id="modalCounter" class="modal-counter"></div>
+    </div>
+
+</main>
+
+<script>
+let fotosAktuell = [];
+let bearbeitungsId = null;
+let aktuelleGalerie = [];
+let aktuellesFotoIndex = 0;
+
+function heuteSetzen() {
+    const now = new Date();
+    document.getElementById("datum").value = now.toISOString().slice(0,10);
+    document.getElementById("uhrzeit").value = now.toTimeString().slice(0,5);
+}
+
+function ladeEintraege() {
+    return JSON.parse(localStorage.getItem("toilettenProtokoll") || "[]");
+}
+
+function speichereEintraege(eintraege) {
+    localStorage.setItem("toilettenProtokoll", JSON.stringify(eintraege));
+}
+
+document.getElementById("fotos").addEventListener("change", function(event) {
+    fotosHinzufuegen(Array.from(event.target.files));
+    document.getElementById("fotos").value = "";
+});
+
+const dropZone = document.getElementById("dropZone");
+
+dropZone.addEventListener("dragover", function(event) {
+    event.preventDefault();
+    dropZone.classList.add("dragover");
+});
+
+dropZone.addEventListener("dragleave", function() {
+    dropZone.classList.remove("dragover");
+});
+
+dropZone.addEventListener("drop", function(event) {
+    event.preventDefault();
+    dropZone.classList.remove("dragover");
+    fotosHinzufuegen(Array.from(event.dataTransfer.files));
+});
+
+function fotosHinzufuegen(files) {
+    const bilder = files.filter(file => file.type.startsWith("image/"));
+
+    if (bilder.length === 0) {
+        alert("Bitte nur Bilddateien auswählen.");
+        return;
+    }
+
+    bilder.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            fotosAktuell.push(e.target.result);
+            fotoVorschauAktualisieren();
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function fotoVorschauAktualisieren() {
+    const vorschau = document.getElementById("fotoVorschau");
+    vorschau.innerHTML = "";
+
+    fotosAktuell.forEach((src, index) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "photo-wrapper";
+
+        const img = document.createElement("img");
+        img.src = src;
+        img.title = "Foto anklicken für Großansicht";
+        img.onclick = function() {
+            aktuelleGalerie = fotosAktuell;
+            aktuellesFotoIndex = index;
+            aktualisiereGrossansicht();
+            document.getElementById("photoModal").style.display = "flex";
+        };
+
+        const remove = document.createElement("button");
+        remove.className = "remove-photo";
+        remove.innerHTML = "×";
+        remove.title = "Foto entfernen";
+        remove.onclick = function(event) {
+            event.stopPropagation();
+            fotoEntfernen(index);
+        };
+
+        wrapper.appendChild(img);
+        wrapper.appendChild(remove);
+        vorschau.appendChild(wrapper);
+    });
+
+    document.getElementById("fotoAnzahl").textContent =
+        fotosAktuell.length === 0
+            ? "Keine Fotos ausgewählt"
+            : fotosAktuell.length + " Foto(s) ausgewählt";
+}
+
+function fotoEntfernen(index) {
+    fotosAktuell.splice(index, 1);
+    fotoVorschauAktualisieren();
+}
+
+function speichern() {
+    const eintrag = {
+        id: bearbeitungsId || Date.now(),
+        datum: document.getElementById("datum").value,
+        uhrzeit: document.getElementById("uhrzeit").value,
+        bereich: document.getElementById("bereich").value,
+        art: document.getElementById("art").value,
+        beschreibung: document.getElementById("beschreibung").value,
+        massnahme: document.getElementById("massnahme").value,
+        meldung: document.getElementById("meldung").value,
+        aufsicht: document.getElementById("aufsicht").value,
+        fotos: fotosAktuell,
+        zuletztGeaendert: bearbeitungsId ? new Date().toLocaleString("de-DE") : ""
+    };
+
+    if (!eintrag.datum || !eintrag.uhrzeit || !eintrag.bereich || !eintrag.beschreibung) {
+        alert("Bitte mindestens Datum, Uhrzeit, Bereich und Beschreibung ausfüllen.");
+        return;
+    }
+
+    const eintraege = ladeEintraege();
+
+    if (bearbeitungsId) {
+        const index = eintraege.findIndex(e => e.id === bearbeitungsId);
+        if (index !== -1) {
+            eintraege[index] = eintrag;
+        }
+        speichereEintraege(eintraege);
+        formularLeeren();
+        anzeigen();
+        alert("Eintrag wurde geändert.");
+    } else {
+        eintraege.push(eintrag);
+        speichereEintraege(eintraege);
+        formularLeeren();
+        anzeigen();
+        alert("Eintrag gespeichert.");
+    }
+}
+
+function formularLeeren() {
+    document.getElementById("bereich").value = "";
+    document.getElementById("beschreibung").value = "";
+    document.getElementById("massnahme").value = "";
+    document.getElementById("meldung").value = "";
+    document.getElementById("aufsicht").value = "";
+    document.getElementById("fotos").value = "";
+    document.getElementById("fotoVorschau").innerHTML = "";
+    fotosAktuell = [];
+    fotoVorschauAktualisieren();
+    bearbeitungsId = null;
+    document.getElementById("speicherButton").textContent = "Eintrag speichern";
+    document.getElementById("abbrechenButton").classList.add("hidden");
+    heuteSetzen();
+}
+
+function anzeigen() {
+    const suche = document.getElementById("suche").value.toLowerCase();
+    let eintraege = ladeEintraege();
+    eintraege.sort((a,b) => (b.datum + b.uhrzeit).localeCompare(a.datum + a.uhrzeit));
+
+    if (suche) {
+        eintraege = eintraege.filter(e =>
+            JSON.stringify(e).toLowerCase().includes(suche)
+        );
+    }
+
+    document.getElementById("anzahl").textContent = "Anzahl Einträge: " + eintraege.length;
+    const tbody = document.getElementById("liste");
+    tbody.innerHTML = "";
+
+    eintraege.forEach(e => {
+        const tr = document.createElement("tr");
+        const fotosHtml = (e.fotos || []).map((src, index) => `<img class="entry-photo" src="${src}" onclick="fotoGrossAnzeigen(${e.id}, ${index})" title="Foto groß anzeigen">`).join("");
+        tr.innerHTML = `
+            <td>${escapeHtml(e.datum || "")}</td>
+            <td>${escapeHtml(e.uhrzeit || "")}</td>
+            <td>${escapeHtml(e.bereich || "")}</td>
+            <td>${escapeHtml(e.art || "")}</td>
+            <td>${escapeHtml(e.beschreibung || "")}</td>
+            <td>${escapeHtml(e.massnahme || "")}</td>
+            <td>
+                <b>Meldung:</b> ${escapeHtml(e.meldung || "")}<br>
+                <b>Hinweis:</b> ${escapeHtml(e.aufsicht || "")}<br>
+                ${e.zuletztGeaendert ? "<b>Geändert:</b> " + escapeHtml(e.zuletztGeaendert) : ""}
+            </td>
+            <td>${fotosHtml}</td>
+            <td class="no-print">
+                <button onclick="bearbeiten(${e.id})">Bearbeiten</button>
+                <button class="danger" onclick="loeschen(${e.id})">Löschen</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function bearbeiten(id) {
+    const eintrag = ladeEintraege().find(e => e.id === id);
+    if (!eintrag) {
+        alert("Eintrag wurde nicht gefunden.");
+        return;
+    }
+
+    bearbeitungsId = id;
+
+    document.getElementById("datum").value = eintrag.datum || "";
+    document.getElementById("uhrzeit").value = eintrag.uhrzeit || "";
+    document.getElementById("bereich").value = eintrag.bereich || "";
+    document.getElementById("art").value = eintrag.art || "Verstopfung";
+    document.getElementById("beschreibung").value = eintrag.beschreibung || "";
+    document.getElementById("massnahme").value = eintrag.massnahme || "";
+    document.getElementById("meldung").value = eintrag.meldung || "";
+    document.getElementById("aufsicht").value = eintrag.aufsicht || "";
+
+    fotosAktuell = eintrag.fotos || [];
+    fotoVorschauAktualisieren();
+
+    document.getElementById("fotos").value = "";
+    document.getElementById("speicherButton").textContent = "Änderungen speichern";
+    document.getElementById("abbrechenButton").classList.remove("hidden");
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function bearbeitenAbbrechen() {
+    formularLeeren();
+}
+
+function loeschen(id) {
+    if (!confirm("Diesen Eintrag wirklich löschen?")) return;
+    const eintraege = ladeEintraege().filter(e => e.id !== id);
+    speichereEintraege(eintraege);
+    anzeigen();
+}
+
+function alleLoeschen() {
+    if (!confirm("Wirklich ALLE Einträge löschen? Vorher am besten exportieren.")) return;
+    localStorage.removeItem("toilettenProtokoll");
+    anzeigen();
+}
+
+function exportJSON() {
+    const daten = localStorage.getItem("toilettenProtokoll") || "[]";
+    const blob = new Blob([daten], {type: "application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "schultoiletten_protokoll_sicherung.json";
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function importJSON(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const daten = JSON.parse(e.target.result);
+            if (!Array.isArray(daten)) throw new Error();
+            localStorage.setItem("toilettenProtokoll", JSON.stringify(daten));
+            anzeigen();
+            alert("Sicherung importiert.");
+        } catch {
+            alert("Die Datei konnte nicht importiert werden.");
+        }
+    };
+    reader.readAsText(file);
+}
+
+function fotoGrossAnzeigen(eintragId, fotoIndex) {
+    const eintrag = ladeEintraege().find(e => e.id === eintragId);
+    if (!eintrag || !eintrag.fotos || eintrag.fotos.length === 0) return;
+
+    aktuelleGalerie = eintrag.fotos;
+    aktuellesFotoIndex = fotoIndex;
+
+    aktualisiereGrossansicht();
+    document.getElementById("photoModal").style.display = "flex";
+}
+
+function aktualisiereGrossansicht() {
+    if (!aktuelleGalerie.length) return;
+
+    document.getElementById("modalImage").src = aktuelleGalerie[aktuellesFotoIndex];
+    document.getElementById("modalCounter").textContent =
+        "Foto " + (aktuellesFotoIndex + 1) + " von " + aktuelleGalerie.length;
+}
+
+function fotoWeiter() {
+    if (!aktuelleGalerie.length) return;
+    aktuellesFotoIndex = (aktuellesFotoIndex + 1) % aktuelleGalerie.length;
+    aktualisiereGrossansicht();
+}
+
+function fotoZurueck() {
+    if (!aktuelleGalerie.length) return;
+    aktuellesFotoIndex = (aktuellesFotoIndex - 1 + aktuelleGalerie.length) % aktuelleGalerie.length;
+    aktualisiereGrossansicht();
+}
+
+function fotoSchliessen() {
+    document.getElementById("photoModal").style.display = "none";
+    document.getElementById("modalImage").src = "";
+    aktuelleGalerie = [];
+    aktuellesFotoIndex = 0;
+}
+
+function modalHintergrundSchliessen(event) {
+    if (event.target.id === "photoModal") {
+        fotoSchliessen();
+    }
+}
+
+document.addEventListener("keydown", function(event) {
+    const modalOffen = document.getElementById("photoModal").style.display === "flex";
+    if (!modalOffen) return;
+
+    if (event.key === "Escape") fotoSchliessen();
+    if (event.key === "ArrowRight") fotoWeiter();
+    if (event.key === "ArrowLeft") fotoZurueck();
+});
+
+function escapeHtml(text) {
+    return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+heuteSetzen();
+fotoVorschauAktualisieren();
+anzeigen();
+</script>
+
+
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function() {
+        navigator.serviceWorker.register("service-worker.js").catch(function(error) {
+            console.log("Service Worker Fehler:", error);
+        });
+    });
+}
+</script>
+
+</body>
+</html>
