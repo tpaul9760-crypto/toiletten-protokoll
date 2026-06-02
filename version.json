@@ -1,0 +1,5 @@
+{
+  "version": "1.4.1-normal",
+  "hinweis": "Toiletten-Protokoll Normal-Version.",
+  "changelog": "v1.4.1 Normal\n- Abgespeckte Version ohne Login und ohne Firebase\n- Mobile Kartenansicht\n- Foto aufnehmen / Galerie / Dateien / Drag & Drop\n- Export/Import inkl. Fotos\n- Update-Prüfung\n- Changelog als Dropdown"
+}
